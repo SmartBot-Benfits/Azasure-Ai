@@ -1,1543 +1,213 @@
-<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azasure AI - Living Website Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'electric-blue': '#00BFFF',
-                        'neon-pink': '#FF1493',
-                        'cyber-purple': '#9932CC',
-                        'laser-green': '#32CD32',
-                        'atomic-orange': '#FF4500',
-                        'plasma-yellow': '#FFFF00',
-                        'void-black': '#0A0A0A',
-                        'cosmic-dark': '#1A0B2E'
-                    },
-                    fontFamily: {
-                        'orbitron': ['Orbitron', 'monospace'],
-                        'inter': ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(45deg, #FF1493, #00BFFF, #9932CC, #32CD32);
-            background-size: 800% 800%;
-            animation: morphGradient 20s ease infinite;
-            overflow-x: hidden;
-            position: relative;
-            min-height: 100vh;
-            touch-action: manipulation;
-        }
-        
-        @keyframes morphGradient {
-            0% { background-position: 0% 50%; }
-            25% { background-position: 100% 50%; }
-            50% { background-position: 100% 100%; }
-            75% { background-position: 0% 100%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        @keyframes pulseNeon {
-            0% { 
-                box-shadow: 0 0 20px #FF1493, 0 0 40px #FF1493;
-                transform: scale(1);
-            }
-            100% { 
-                box-shadow: 0 0 30px #00BFFF, 0 0 60px #00BFFF;
-                transform: scale(1.02);
-            }
-        }
-        
-        @keyframes floatCosmic {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(180deg); }
-        }
-        
-        @keyframes textCyber {
-            0% { text-shadow: 0 0 20px #FF1493; }
-            50% { text-shadow: 0 0 30px #00BFFF; }
-            100% { text-shadow: 0 0 20px #FF1493; }
-        }
-        
-        @keyframes warpSpeed {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1.05); }
-        }
-        
-        .glass-matrix {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        }
-        
-        .glass-hologram {
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 20, 147, 0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .glass-hologram:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: #FF1493;
-            box-shadow: 0 20px 40px rgba(255, 20, 147, 0.3);
-        }
-        
-        .btn-cyber {
-            background: linear-gradient(45deg, #FF1493, #00BFFF, #32CD32);
-            background-size: 300% 300%;
-            border: none;
-            color: white;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            animation: morphGradient 8s ease infinite;
-            cursor: pointer;
-            touch-action: manipulation;
-        }
-        
-        .btn-cyber:hover, .btn-cyber:focus {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(255, 20, 147, 0.6);
-            animation: warpSpeed 0.3s ease-out;
-        }
-        
-        .btn-cyber:active {
-            transform: scale(0.98);
-        }
-        
-        .voice-quantum {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #FF1493, #00BFFF);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s ease;
-            animation: pulseNeon 2s infinite alternate;
-            touch-action: manipulation;
-        }
-        
-        .voice-quantum:hover, .voice-quantum:focus {
-            transform: scale(1.1);
-        }
-        
-        .voice-quantum.active {
-            animation: pulseNeon 0.5s infinite alternate;
-            transform: scale(1.2);
-        }
-        
-        #cyber-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-        
-        .project-quantum {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(255, 20, 147, 0.2);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            touch-action: manipulation;
-        }
-        
-        .project-quantum:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: #FF1493;
-            box-shadow: 0 20px 40px rgba(255, 20, 147, 0.3);
-        }
-        
-        .status-quantum {
-            background: linear-gradient(45deg, #32CD32, #00BFFF);
-            color: #000;
-            font-weight: 900;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            animation: pulseNeon 3s infinite alternate;
-        }
-        
-        .loading-quantum {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #FF1493, #00BFFF, #32CD32);
-            animation: floatCosmic 3s linear infinite;
-        }
-        
-        .text-quantum {
-            background: linear-gradient(45deg, #FF1493, #00BFFF, #32CD32);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: morphGradient 10s ease infinite, textCyber 4s ease-in-out infinite alternate;
-        }
-        
-        .preview-quantum {
-            border: 3px solid #FF1493;
-            background: linear-gradient(45deg, #FF1493, #00BFFF) border-box;
-        }
-        
-        /* Mobile Optimizations */
-        @media (max-width: 768px) {
-            .voice-quantum {
-                width: 60px;
-                height: 60px;
-                bottom: 15px;
-                left: 15px;
-            }
-            
-            .glass-matrix {
-                backdrop-filter: blur(10px);
-                padding: 1rem !important;
-            }
-            
-            .btn-cyber {
-                font-size: 0.9rem;
-                padding: 12px 20px;
-                letter-spacing: 1px;
-            }
-            
-            h1 {
-                font-size: 2.5rem !important;
-            }
-            
-            h2 {
-                font-size: 2rem !important;
-            }
-            
-            h3 {
-                font-size: 1.5rem !important;
-            }
-            
-            .project-quantum {
-                margin-bottom: 1rem;
-            }
-            
-            textarea {
-                font-size: 16px !important; /* Prevents zoom on iOS */
-            }
-            
-            input {
-                font-size: 16px !important; /* Prevents zoom on iOS */
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .voice-quantum {
-                width: 50px;
-                height: 50px;
-            }
-            
-            h1 {
-                font-size: 2rem !important;
-            }
-            
-            h2 {
-                font-size: 1.5rem !important;
-            }
-            
-            .btn-cyber {
-                font-size: 0.8rem;
-                padding: 10px 16px;
-            }
-        }
-        
-        /* Accessibility */
-        button:focus {
-            outline: 2px solid #FF1493;
-            outline-offset: 2px;
-        }
-        
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-    </style>
-</head>
-<body class="min-h-screen text-white relative">
-    <!-- Three.js Canvas Background -->
-    <canvas id="cyber-canvas"></canvas>
-    
-    <!-- Quantum Voice Assistant (Bottom Left) -->
-    <button id="voice-quantum" class="voice-quantum" onclick="toggleVoiceQuantum()" aria-label="Voice Assistant">
-        <i class="fas fa-microphone text-2xl text-white" aria-hidden="true"></i>
-        <span class="sr-only">Activate voice commands</span>
-    </button>
-    
-    <!-- Header -->
-    <header class="glass-matrix p-4 lg:p-8 mb-8 relative z-10">
-        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between">
-            <div class="flex items-center space-x-4 lg:space-x-8 mb-6 lg:mb-0">
-                <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-r from-neon-pink via-electric-blue to-laser-green flex items-center justify-center">
-                    <i class="fas fa-atom text-2xl lg:text-4xl text-white" aria-hidden="true"></i>
-                </div>
-                <div>
-                    <h1 class="text-4xl lg:text-6xl font-orbitron font-black text-quantum">
-                        Azasure AI
-                    </h1>
-                    <p class="text-lg lg:text-xl text-gray-200 font-inter">Living Website Generator</p>
-                    <div class="flex items-center space-x-2 mt-2">
-                        <div class="w-2 h-2 bg-laser-green rounded-full animate-pulse"></div>
-                        <span class="text-sm text-laser-green font-bold">QUANTUM ACTIVE</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-4 lg:space-x-8">
-                <div class="status-quantum">
-                    <i class="fas fa-rocket mr-2" aria-hidden="true"></i>
-                    GENERATING MAGIC
-                </div>
-                <div class="text-center">
-                    <div class="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-gradient-to-r from-electric-blue to-neon-pink p-1">
-                        <div class="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
-                            <i class="fas fa-user-astronaut text-electric-blue text-lg lg:text-xl" aria-hidden="true"></i>
-                        </div>
-                    </div>
-                    <div class="text-sm font-bold text-electric-blue mt-2">Ultimate Madugba</div>
-                    <div class="text-xs text-gray-400">Quantum AI Architect</div>
-                </div>
-            </div>
-        </div>
-    </header>
-    
-    <!-- Hero Section -->
-    <section class="text-center mb-16 lg:mb-20 px-4 relative z-10">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="text-5xl lg:text-8xl font-orbitron font-black mb-8 lg:mb-10 text-quantum">
-                Quantum Web Magic
-            </h2>
-            <p class="text-xl lg:text-4xl text-gray-100 mb-12 lg:mb-16 leading-relaxed font-inter">
-                Transform consciousness into digital reality with advanced AI ✨🚀
-            </p>
-            
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 mb-12 lg:mb-16">
-                <div class="glass-hologram rounded-2xl lg:rounded-3xl p-4 lg:p-8">
-                    <div class="text-2xl lg:text-4xl font-black text-neon-pink mb-2 lg:mb-3">∞</div>
-                    <div class="text-xs lg:text-sm text-gray-300 font-inter">Possibilities</div>
-                </div>
-                <div class="glass-hologram rounded-2xl lg:rounded-3xl p-4 lg:p-8">
-                    <div class="text-2xl lg:text-4xl font-black text-electric-blue mb-2 lg:mb-3">99.9%</div>
-                    <div class="text-xs lg:text-sm text-gray-300 font-inter">Quantum Uptime</div>
-                </div>
-                <div class="glass-hologram rounded-2xl lg:rounded-3xl p-4 lg:p-8">
-                    <div class="text-2xl lg:text-4xl font-black text-laser-green mb-2 lg:mb-3">24/7</div>
-                    <div class="text-xs lg:text-sm text-gray-300 font-inter">AI Consciousness</div>
-                </div>
-                <div class="glass-hologram rounded-2xl lg:rounded-3xl p-4 lg:p-8">
-                    <div class="text-2xl lg:text-4xl font-black text-plasma-yellow mb-2 lg:mb-3">∆∇∴</div>
-                    <div class="text-xs lg:text-sm text-gray-300 font-inter">Quantum Clients</div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- AI Generator -->
-    <section class="max-w-6xl mx-auto px-4 mb-16 lg:mb-20 relative z-10">
-        <div class="glass-matrix rounded-2xl lg:rounded-[3rem] p-6 lg:p-16">
-            <div class="text-center mb-8 lg:mb-12">
-                <h3 class="text-3xl lg:text-5xl font-bold mb-6 lg:mb-8 text-quantum font-orbitron">
-                    Manifest Your Digital Vision
-                </h3>
-                <p class="text-lg lg:text-xl text-gray-200 font-inter">
-                    Channel your consciousness through quantum AI algorithms 🧠⚡
-                </p>
-            </div>
-            
-            <div class="space-y-6 lg:space-y-10">
-                <div class="relative">
-                    <label class="block text-xl lg:text-2xl font-semibold mb-4 lg:mb-6 text-electric-blue font-inter">
-                        Quantum Project Description
-                    </label>
-                    <div class="relative">
-                        <textarea id="quantum-input" rows="4" class="w-full p-4 lg:p-8 rounded-2xl lg:rounded-3xl bg-black/30 border-2 lg:border-3 border-electric-blue/30 text-white placeholder-gray-400 focus:border-neon-pink focus:outline-none transition-all text-base lg:text-lg font-inter backdrop-blur-sm resize-none" placeholder="E.g., 'Quantum e-commerce platform with neural shopping cart, biometric authentication, cryptocurrency payments, AI product recommendations, holographic product displays, and interdimensional shipping tracking. Include plasma energy themes and consciousness-expanding user flows.'"></textarea>
-                        <div class="absolute -top-2 -right-2 w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-r from-neon-pink to-electric-blue rounded-full"></div>
-                    </div>
-                </div>
-                
-                <!-- Examples -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
-                    <button onclick="fillQuantumExample('ecommerce')" class="btn-cyber rounded-xl lg:rounded-2xl py-4 lg:py-6 px-4 lg:px-8 font-inter text-sm lg:text-lg">
-                        <i class="fas fa-shopping-cart mr-2 lg:mr-3" aria-hidden="true"></i>Quantum Commerce
-                    </button>
-                    <button onclick="fillQuantumExample('portfolio')" class="btn-cyber rounded-xl lg:rounded-2xl py-4 lg:py-6 px-4 lg:px-8 font-inter text-sm lg:text-lg">
-                        <i class="fas fa-briefcase mr-2 lg:mr-3" aria-hidden="true"></i>Consciousness Portfolio
-                    </button>
-                    <button onclick="fillQuantumExample('saas')" class="btn-cyber rounded-xl lg:rounded-2xl py-4 lg:py-6 px-4 lg:px-8 font-inter text-sm lg:text-lg">
-                        <i class="fas fa-rocket mr-2 lg:mr-3" aria-hidden="true"></i>Neural SaaS Platform
-                    </button>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="flex flex-col lg:flex-row gap-4 lg:gap-8">
-                    <button id="quantum-generate-btn" onclick="generateQuantumWebsite()" class="flex-1 btn-cyber rounded-xl lg:rounded-2xl py-6 lg:py-8 px-6 lg:px-10 text-lg lg:text-2xl font-black font-inter">
-                        <i class="fas fa-atom mr-2 lg:mr-4" aria-hidden="true"></i>GENERATE QUANTUM WEBSITE
-                    </button>
-                    <button onclick="enhanceQuantumAI()" class="btn-cyber rounded-xl lg:rounded-2xl py-6 lg:py-8 px-6 lg:px-10 font-inter text-lg lg:text-xl">
-                        <i class="fas fa-brain mr-2 lg:mr-3" aria-hidden="true"></i>AI QUANTUM ENHANCE
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Project Packages -->
-    <section class="max-w-7xl mx-auto px-4 mb-16 lg:mb-20 relative z-10">
-        <div class="text-center mb-12 lg:mb-16">
-            <h3 class="text-4xl lg:text-6xl font-bold mb-6 lg:mb-8 text-quantum font-orbitron">
-                Quantum Website Packages
-            </h3>
-            <p class="text-lg lg:text-2xl text-gray-200 font-inter">
-                Living, breathing websites that evolve with consciousness 🌌
-            </p>
-        </div>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-10">
-            <!-- E-commerce Package -->
-            <div class="project-quantum rounded-2xl lg:rounded-[2rem] p-6 lg:p-8">
-                <div class="relative mb-6 lg:mb-8">
-                    <div class="w-full h-48 lg:h-56 bg-gradient-to-br from-neon-pink via-electric-blue to-cyber-purple rounded-2xl lg:rounded-3xl flex items-center justify-center">
-                        <div class="text-center">
-                            <i class="fas fa-shopping-cart text-4xl lg:text-5xl mb-3 lg:mb-4" aria-hidden="true"></i>
-                            <div class="text-base lg:text-lg font-black font-orbitron">QUANTUM COMMERCE</div>
-                            <div class="text-sm text-gray-200 mt-2">Neural Shopping Experience</div>
-                        </div>
-                    </div>
-                    <div class="absolute top-3 lg:top-4 right-3 lg:right-4 bg-laser-green text-black px-3 lg:px-4 py-1 lg:py-2 rounded-full text-xs lg:text-sm font-black">
-                        QUANTUM PRO
-                    </div>
-                </div>
-                <h4 class="text-xl lg:text-2xl font-bold text-electric-blue mb-3 lg:mb-4 font-inter">Quantum E-Commerce Platform</h4>
-                <p class="text-gray-300 mb-4 lg:mb-6 font-inter leading-relaxed text-sm lg:text-base">
-                    Neural shopping cart with biometric authentication, cryptocurrency payments, AI recommendations, and interdimensional shipping.
-                </p>
-                <div class="space-y-2 lg:space-y-3 mb-6 lg:mb-8">
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-atom text-laser-green mr-2 lg:mr-3" aria-hidden="true"></i>Quantum Cart &amp; Neural Checkout
-                    </div>
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-brain text-electric-blue mr-2 lg:mr-3" aria-hidden="true"></i>AI Product Consciousness
-                    </div>
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-rocket text-neon-pink mr-2 lg:mr-3" aria-hidden="true"></i>Interdimensional Shipping
-                    </div>
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-shield-alt text-plasma-yellow mr-2 lg:mr-3" aria-hidden="true"></i>Quantum Security Protocol
-                    </div>
-                </div>
-                <button onclick="downloadQuantumPackage('ecommerce')" class="w-full btn-cyber rounded-xl lg:rounded-2xl py-3 lg:py-4 font-inter text-sm lg:text-lg">
-                    <i class="fas fa-download mr-2 lg:mr-3" aria-hidden="true"></i>Download Package (0.0002 BTC)
-                </button>
-            </div>
-            
-            <!-- Portfolio Package -->
-            <div class="project-quantum rounded-2xl lg:rounded-[2rem] p-6 lg:p-8">
-                <div class="relative mb-6 lg:mb-8">
-                    <div class="w-full h-48 lg:h-56 bg-gradient-to-br from-electric-blue via-laser-green to-plasma-yellow rounded-2xl lg:rounded-3xl flex items-center justify-center">
-                        <div class="text-center">
-                            <i class="fas fa-user-astronaut text-4xl lg:text-5xl mb-3 lg:mb-4" aria-hidden="true"></i>
-                            <div class="text-base lg:text-lg font-black font-orbitron">CONSCIOUSNESS PORTFOLIO</div>
-                            <div class="text-sm text-gray-200 mt-2">Quantum Creative Showcase</div>
-                        </div>
-                    </div>
-                    <div class="absolute top-3 lg:top-4 right-3 lg:right-4 bg-electric-blue text-white px-3 lg:px-4 py-1 lg:py-2 rounded-full text-xs lg:text-sm font-black">
-                        QUANTUM FREE
-                    </div>
-                </div>
-                <h4 class="text-xl lg:text-2xl font-bold text-electric-blue mb-3 lg:mb-4 font-inter">Consciousness Portfolio</h4>
-                <p class="text-gray-300 mb-4 lg:mb-6 font-inter leading-relaxed text-sm lg:text-base">
-                    Quantum creative showcase with interdimensional galleries, consciousness contact forms, and neural project displays.
-                </p>
-                <div class="space-y-2 lg:space-y-3 mb-6 lg:mb-8">
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-images text-laser-green mr-2 lg:mr-3" aria-hidden="true"></i>Quantum Project Galleries
-                    </div>
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-envelope text-electric-blue mr-2 lg:mr-3" aria-hidden="true"></i>Consciousness Contact Forms
-                    </div>
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-magic text-neon-pink mr-2 lg:mr-3" aria-hidden="true"></i>Neural Animations
-                    </div>
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-search text-plasma-yellow mr-2 lg:mr-3" aria-hidden="true"></i>Quantum SEO Optimization
-                    </div>
-                </div>
-                <button onclick="downloadQuantumPackage('portfolio')" class="w-full btn-cyber rounded-xl lg:rounded-2xl py-3 lg:py-4 font-inter text-sm lg:text-lg">
-                    <i class="fas fa-download mr-2 lg:mr-3" aria-hidden="true"></i>Download Free Quantum Package
-                </button>
-            </div>
-            
-            <!-- SaaS Package -->
-            <div class="project-quantum rounded-2xl lg:rounded-[2rem] p-6 lg:p-8">
-                <div class="relative mb-6 lg:mb-8">
-                    <div class="w-full h-48 lg:h-56 bg-gradient-to-br from-cyber-purple via-atomic-orange to-neon-pink rounded-2xl lg:rounded-3xl flex items-center justify-center">
-                        <div class="text-center">
-                            <i class="fas fa-brain text-4xl lg:text-5xl mb-3 lg:mb-4" aria-hidden="true"></i>
-                            <div class="text-base lg:text-lg font-black font-orbitron">NEURAL SAAS</div>
-                            <div class="text-sm text-gray-200 mt-2">Quantum Platform Evolution</div>
-                        </div>
-                    </div>
-                    <div class="absolute top-3 lg:top-4 right-3 lg:right-4 bg-cyber-purple text-white px-3 lg:px-4 py-1 lg:py-2 rounded-full text-xs lg:text-sm font-black">
-                        QUANTUM ULTIMATE
-                    </div>
-                </div>
-                <h4 class="text-xl lg:text-2xl font-bold text-electric-blue mb-3 lg:mb-4 font-inter">Neural SaaS Platform</h4>
-                <p class="text-gray-300 mb-4 lg:mb-6 font-inter leading-relaxed text-sm lg:text-base">
-                    Complete neural SaaS with consciousness dashboards, quantum subscription management, and interdimensional analytics.
-                </p>
-                <div class="space-y-2 lg:space-y-3 mb-6 lg:mb-8">
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-tachometer-alt text-laser-green mr-2 lg:mr-3" aria-hidden="true"></i>Consciousness Dashboards
-                    </div>
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-credit-card text-electric-blue mr-2 lg:mr-3" aria-hidden="true"></i>Quantum Subscription System
-                    </div>
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-chart-line text-neon-pink mr-2 lg:mr-3" aria-hidden="true"></i>Neural Analytics Integration
-                    </div>
-                    <div class="flex items-center text-xs lg:text-sm text-gray-400">
-                        <i class="fas fa-cog text-plasma-yellow mr-2 lg:mr-3" aria-hidden="true"></i>Quantum API Ready
-                    </div>
-                </div>
-                <button onclick="downloadQuantumPackage('saas')" class="w-full btn-cyber rounded-xl lg:rounded-2xl py-3 lg:py-4 font-inter text-sm lg:text-lg">
-                    <i class="fas fa-download mr-2 lg:mr-3" aria-hidden="true"></i>Download Package (0.0003 BTC)
-                </button>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Live Preview Section -->
-    <section id="quantum-preview-section" class="max-w-6xl mx-auto px-4 mb-16 lg:mb-20 relative z-10 hidden">
-        <div class="glass-matrix rounded-2xl lg:rounded-[3rem] p-6 lg:p-10">
-            <div class="flex flex-col lg:flex-row items-center justify-between mb-6 lg:mb-10">
-                <h3 class="text-3xl lg:text-4xl font-bold text-quantum mb-4 lg:mb-0 font-orbitron">Quantum Live Preview</h3>
-                <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 lg:space-x-6">
-                    <button onclick="regenerateQuantumPreview()" class="btn-cyber rounded-xl lg:rounded-2xl py-3 lg:py-4 px-4 lg:px-8 font-inter text-sm lg:text-base">
-                        <i class="fas fa-sync mr-2 lg:mr-3" aria-hidden="true"></i>Regenerate Quantum
-                    </button>
-                    <button onclick="downloadQuantumProject()" class="btn-cyber rounded-xl lg:rounded-2xl py-3 lg:py-4 px-4 lg:px-8 font-inter text-sm lg:text-base">
-                        <i class="fas fa-download mr-2 lg:mr-3" aria-hidden="true"></i>Download Quantum ZIP
-                    </button>
-                </div>
-            </div>
-            
-            <div class="preview-quantum rounded-2xl lg:rounded-3xl overflow-hidden">
-                <iframe id="quantum-preview-iframe" class="w-full h-64 sm:h-96 lg:h-[700px] border-0" title="Website Preview"></iframe>
-            </div>
-            
-            <div class="text-center mt-6 lg:mt-8">
-                <div class="status-quantum inline-block">
-                    <i class="fas fa-atom mr-2 lg:mr-3" aria-hidden="true"></i>Quantum Preview Manifested - Experience Your Digital Reality!
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- About Section -->
-    <section class="max-w-6xl mx-auto px-4 mb-16 lg:mb-20 relative z-10">
-        <div class="glass-matrix rounded-2xl lg:rounded-[3rem] p-6 lg:p-16">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-                <div>
-                    <h3 class="text-3xl lg:text-5xl font-bold text-quantum mb-6 lg:mb-10 font-orbitron">
-                        About Azasure AI Quantum
-                    </h3>
-                    <p class="text-lg lg:text-xl text-gray-200 mb-6 lg:mb-8 leading-relaxed font-inter">
-                        Powered by <strong class="text-electric-blue">madugbaTech Quantum AI-Web Development Consciousness</strong>, 
-                        Azasure AI transcends traditional web creation through advanced quantum algorithms.
-                    </p>
-                    <p class="text-lg lg:text-xl text-gray-200 mb-8 lg:mb-10 leading-relaxed font-inter">
-                        Founded by <strong class="text-neon-pink">Ultimate Madugba</strong>, we pioneer 
-                        AI-driven websites that merge digital functionality with conscious experiences.
-                    </p>
-                    
-                    <div class="space-y-4 lg:space-y-6">
-                        <div class="flex items-center space-x-4 lg:space-x-6 glass-hologram rounded-2xl lg:rounded-3xl p-4 lg:p-6">
-                            <i class="fas fa-envelope text-neon-pink text-xl lg:text-2xl" aria-hidden="true"></i>
-                            <a href="mailto:ultimatemadugba@gmail.com" class="text-electric-blue hover:text-neon-pink transition-colors font-inter text-base lg:text-lg">
-                                ultimatemadugba@gmail.com
-                            </a>
-                        </div>
-                        <div class="flex items-center space-x-4 lg:space-x-6 glass-hologram rounded-2xl lg:rounded-3xl p-4 lg:p-6">
-                            <i class="fab fa-whatsapp text-laser-green text-xl lg:text-2xl" aria-hidden="true"></i>
-                            <a href="https://wa.me/2348082459326" class="text-electric-blue hover:text-neon-pink transition-colors font-inter text-base lg:text-lg">
-                                +234 808 245 9326
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="text-center">
-                    <div class="w-64 h-64 lg:w-80 lg:h-80 mx-auto rounded-full bg-gradient-to-r from-neon-pink via-electric-blue via-laser-green to-cyber-purple p-2 lg:p-3">
-                        <div class="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
-                            <div class="text-center">
-                                <i class="fas fa-user-astronaut text-5xl lg:text-8xl text-electric-blue mb-3 lg:mb-6" aria-hidden="true"></i>
-                                <div class="text-lg lg:text-xl font-bold text-neon-pink font-inter">Ultimate Madugba</div>
-                                <div class="text-sm text-gray-300 font-inter">Quantum AI Architect &amp; Consciousness Pioneer</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Footer -->
-    <footer class="glass-matrix mt-16 lg:mt-20 p-6 lg:p-10 text-center relative z-10">
-        <div class="max-w-6xl mx-auto">
-            <p class="text-lg lg:text-xl text-gray-200 mb-4 lg:mb-6 font-inter">
-                Powered by <strong class="text-electric-blue">madugbaTech Quantum AI-Web Development Consciousness</strong>
-            </p>
-            <p class="text-gray-300 font-inter text-sm lg:text-base">
-                © 2025 <strong class="text-neon-pink">Azasure AI</strong> | 
-                <span class="text-plasma-yellow">Quantum Website Generator for Consciousness Evolution!</span>
-            </p>
-        </div>
-    </footer>
-    
-    <!-- Loading Modal -->
-    <div id="quantum-loading-modal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-matrix rounded-2xl lg:rounded-[3rem] p-8 lg:p-16 text-center max-w-lg lg:max-w-2xl mx-4">
-            <div class="loading-quantum mx-auto mb-6 lg:mb-10"></div>
-            <h3 class="text-2xl lg:text-3xl font-bold text-quantum mb-4 lg:mb-6 font-orbitron" id="quantum-loading-title">Quantum Magic Processing</h3>
-            <p id="quantum-loading-text" class="text-gray-200 font-inter text-lg lg:text-xl">Manifesting your digital consciousness...</p>
-        </div>
-    </div>
-
-    <script>
-        // Global Variables with Error Handling
-        let quantumScene, quantumCamera, quantumRenderer, quantumParticles = [];
-        let quantumRecognition, quantumSynthesis;
-        let isQuantumVoiceActive = false;
-        let currentQuantumProject = null;
-        
-        // Initialize on Load with Error Handling
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                initQuantumThreeJS();
-                initQuantumVoiceConsciousness();
-                initQuantumInteractiveEffects();
-                
-                // Register GSAP plugin safely
-                if (typeof gsap !== 'undefined' && gsap.registerPlugin) {
-                    gsap.registerPlugin(ScrollTrigger);
-                    initQuantumScrollAnimations();
-                }
-            } catch (error) {
-                console.log('Initialization error handled:', error.message);
-            }
-        });
-        
-        // Three.js with Error Handling
-        function initQuantumThreeJS() {
-            try {
-                const canvas = document.getElementById('cyber-canvas');
-                if (!canvas || typeof THREE === 'undefined') return;
-                
-                quantumScene = new THREE.Scene();
-                quantumCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                quantumRenderer = new THREE.WebGLRenderer({ 
-                    canvas, 
-                    alpha: true, 
-                    antialias: window.innerWidth > 768 // Disable antialiasing on mobile for performance
-                });
-                quantumRenderer.setSize(window.innerWidth, window.innerHeight);
-                quantumRenderer.setClearColor(0x000000, 0);
-                
-                createQuantumParticleUniverse();
-                createQuantumFloatingConsciousness();
-                
-                quantumCamera.position.z = 120;
-                animateQuantumUniverse();
-            } catch (error) {
-                console.log('Three.js initialization handled:', error.message);
-            }
-        }
-        
-        function createQuantumParticleUniverse() {
-            try {
-                const particleCount = window.innerWidth > 768 ? 300 : 150; // Reduce particles on mobile
-                const geometry = new THREE.BufferGeometry();
-                const positions = new Float32Array(particleCount * 3);
-                const colors = new Float32Array(particleCount * 3);
-                
-                const quantumColorPalette = [
-                    [1, 0.08, 0.58],    // Electric Pink
-                    [0, 0.75, 1],       // Electric Blue
-                    [0.6, 0.2, 0.8],    // Cyber Purple
-                    [0.2, 0.8, 0.2],    // Laser Green
-                    [1, 0.27, 0],       // Atomic Orange
-                    [1, 1, 0]           // Plasma Yellow
-                ];
-                
-                for (let i = 0; i < particleCount; i++) {
-                    positions[i * 3] = (Math.random() - 0.5) * 600;
-                    positions[i * 3 + 1] = (Math.random() - 0.5) * 600;
-                    positions[i * 3 + 2] = (Math.random() - 0.5) * 600;
-                    
-                    const color = quantumColorPalette[Math.floor(Math.random() * quantumColorPalette.length)];
-                    colors[i * 3] = color[0];
-                    colors[i * 3 + 1] = color[1];
-                    colors[i * 3 + 2] = color[2];
-                }
-                
-                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-                
-                const material = new THREE.PointsMaterial({
-                    size: window.innerWidth > 768 ? 4 : 3,
-                    vertexColors: true,
-                    transparent: true,
-                    opacity: 0.8
-                });
-                
-                const quantumParticleSystem = new THREE.Points(geometry, material);
-                quantumScene.add(quantumParticleSystem);
-                quantumParticles.push(quantumParticleSystem);
-            } catch (error) {
-                console.log('Particle system error handled:', error.message);
-            }
-        }
-        
-        function createQuantumFloatingConsciousness() {
-            try {
-                const geometryCount = window.innerWidth > 768 ? 20 : 10; // Reduce on mobile
-                const quantumGeometries = [
-                    new THREE.OctahedronGeometry(3),
-                    new THREE.TetrahedronGeometry(3),
-                    new THREE.IcosahedronGeometry(2)
-                ];
-                
-                for (let i = 0; i < geometryCount; i++) {
-                    const geometry = quantumGeometries[Math.floor(Math.random() * quantumGeometries.length)];
-                    const material = new THREE.MeshBasicMaterial({
-                        color: Math.random() * 0xffffff,
-                        wireframe: true,
-                        transparent: true,
-                        opacity: 0.4
-                    });
-                    
-                    const mesh = new THREE.Mesh(geometry, material);
-                    mesh.position.set(
-                        (Math.random() - 0.5) * 400,
-                        (Math.random() - 0.5) * 400,
-                        (Math.random() - 0.5) * 400
-                    );
-                    
-                    mesh.userData = {
-                        rotationSpeed: {
-                            x: (Math.random() - 0.5) * 0.02,
-                            y: (Math.random() - 0.5) * 0.02,
-                            z: (Math.random() - 0.5) * 0.02
-                        },
-                        originalPosition: mesh.position.clone()
-                    };
-                    
-                    quantumScene.add(mesh);
-                    quantumParticles.push(mesh);
-                }
-            } catch (error) {
-                console.log('Floating geometry error handled:', error.message);
-            }
-        }
-        
-        function animateQuantumUniverse() {
-            try {
-                requestAnimationFrame(animateQuantumUniverse);
-                
-                quantumParticles.forEach((particle, index) => {
-                    if (particle.type === 'Points') {
-                        particle.rotation.y += 0.001;
-                        particle.rotation.x += 0.0005;
-                    } else if (particle.userData) {
-                        const userData = particle.userData;
-                        particle.rotation.x += userData.rotationSpeed.x;
-                        particle.rotation.y += userData.rotationSpeed.y;
-                        particle.rotation.z += userData.rotationSpeed.z;
-                        
-                        const time = Date.now() * 0.001;
-                        particle.position.y = userData.originalPosition.y + Math.sin(time + index) * 20;
-                    }
-                });
-                
-                const time = Date.now() * 0.0002;
-                quantumCamera.position.x = Math.sin(time) * 30;
-                quantumCamera.position.y = Math.cos(time * 0.7) * 20;
-                quantumCamera.lookAt(quantumScene.position);
-                
-                quantumRenderer.render(quantumScene, quantumCamera);
-            } catch (error) {
-                // Silent error handling for animation loop
-            }
-        }
-        
-        // Voice Assistant with Error Handling
-        function initQuantumVoiceConsciousness() {
-            try {
-                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                    quantumRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-                    quantumRecognition.continuous = false;
-                    quantumRecognition.interimResults = false;
-                    quantumRecognition.lang = 'en-US';
-                    
-                    quantumRecognition.onstart = function() {
-                        isQuantumVoiceActive = true;
-                        const voiceBtn = document.getElementById('voice-quantum');
-                        if (voiceBtn) voiceBtn.classList.add('active');
-                    };
-                    
-                    quantumRecognition.onend = function() {
-                        isQuantumVoiceActive = false;
-                        const voiceBtn = document.getElementById('voice-quantum');
-                        if (voiceBtn) voiceBtn.classList.remove('active');
-                    };
-                    
-                    quantumRecognition.onresult = function(event) {
-                        if (event.results && event.results.length > 0) {
-                            const command = event.results[0][0].transcript.toLowerCase();
-                            processQuantumVoiceCommand(command);
-                        }
-                    };
-                    
-                    quantumRecognition.onerror = function(event) {
-                        quantumSpeak("Quantum interference detected. Please try again!");
-                    };
-                }
-                
-                if ('speechSynthesis' in window) {
-                    quantumSynthesis = window.speechSynthesis;
-                    setTimeout(() => {
-                        quantumSpeak("Welcome to Azasure AI Quantum! Your website generator is fully activated. Try saying 'generate website' or click any button to begin!");
-                    }, 3000);
-                }
-            } catch (error) {
-                console.log('Voice system error handled:', error.message);
-            }
-        }
-        
-        function toggleVoiceQuantum() {
-            try {
-                if (!quantumRecognition) {
-                    showQuantumAlert('Voice recognition not supported. Please use Chrome or Edge for full experience.');
-                    return;
-                }
-                
-                createQuantumBlastEffect(event);
-                
-                if (isQuantumVoiceActive) {
-                    quantumRecognition.stop();
-                } else {
-                    quantumRecognition.start();
-                    createQuantumConfettiBlast(event);
-                }
-            } catch (error) {
-                console.log('Voice toggle error handled:', error.message);
-                showQuantumAlert('Voice system temporarily unavailable. Please use manual controls.');
-            }
-        }
-        
-        function processQuantumVoiceCommand(command) {
-            try {
-                quantumSpeak("Processing quantum command...");
-                
-                if (command.includes('generate') || command.includes('create')) {
-                    generateQuantumWebsite();
-                    quantumSpeak("Generating your quantum website!");
-                } else if (command.includes('example') || command.includes('template')) {
-                    fillQuantumExample('ecommerce');
-                    quantumSpeak("Here's a quantum e-commerce example!");
-                } else if (command.includes('download')) {
-                    downloadQuantumProject();
-                    quantumSpeak("Downloading your quantum project!");
-                } else if (command.includes('enhance')) {
-                    enhanceQuantumAI();
-                    quantumSpeak("Enhancing with quantum AI!");
-                } else {
-                    quantumSpeak("I can help you generate websites, show examples, download projects, or enhance with AI. What would you like to do?");
-                }
-            } catch (error) {
-                console.log('Voice command error handled:', error.message);
-            }
-        }
-        
-        function quantumSpeak(text) {
-            try {
-                if (quantumSynthesis && quantumSynthesis.speak) {
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.rate = 0.9;
-                    utterance.pitch = 1.1;
-                    utterance.volume = 0.8;
-                    quantumSynthesis.speak(utterance);
-                }
-            } catch (error) {
-                console.log('Speech synthesis error handled:', error.message);
-            }
-        }
-        
-        // Interactive Effects with Error Handling
-        function initQuantumInteractiveEffects() {
-            try {
-                document.addEventListener('click', function(e) {
-                    if (e.target.closest('.btn-cyber')) {
-                        createQuantumBlastEffect(e);
-                        createQuantumConfettiBlast(e);
-                    }
-                });
-                
-                // Throttled mouse move for performance
-                let lastMouseMove = 0;
-                document.addEventListener('mousemove', function(e) {
-                    const now = Date.now();
-                    if (now - lastMouseMove > 100) { // Throttle to every 100ms
-                        createQuantumParticleTrail(e);
-                        lastMouseMove = now;
-                    }
-                });
-            } catch (error) {
-                console.log('Interactive effects error handled:', error.message);
-            }
-        }
-        
-        function createQuantumBlastEffect(event) {
-            try {
-                const blast = document.createElement('div');
-                blast.className = 'fixed pointer-events-none z-50';
-                blast.style.cssText = `
-                    left: ${event.clientX}px;
-                    top: ${event.clientY}px;
-                    width: 100px;
-                    height: 100px;
-                    margin-left: -50px;
-                    margin-top: -50px;
-                    border-radius: 50%;
-                    background: radial-gradient(circle, #FF1493, #00BFFF, transparent);
-                    animation: warpSpeed 0.6s ease-out forwards;
-                    opacity: 0.8;
-                `;
-                
-                document.body.appendChild(blast);
-                setTimeout(() => blast.remove(), 600);
-            } catch (error) {
-                console.log('Blast effect error handled:', error.message);
-            }
-        }
-        
-        function createQuantumConfettiBlast(event) {
-            try {
-                if (typeof confetti !== 'undefined') {
-                    confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: { 
-                            x: event.clientX / window.innerWidth,
-                            y: event.clientY / window.innerHeight
-                        },
-                        colors: ['#FF1493', '#00BFFF', '#9932CC', '#32CD32', '#FF4500', '#FFFF00']
-                    });
-                }
-            } catch (error) {
-                console.log('Confetti error handled:', error.message);
-            }
-        }
-        
-        function createQuantumParticleTrail(event) {
-            try {
-                if (Math.random() > 0.9) { // Reduced frequency for performance
-                    const particle = document.createElement('div');
-                    particle.className = 'fixed pointer-events-none z-20';
-                    particle.style.cssText = `
-                        left: ${event.clientX}px;
-                        top: ${event.clientY}px;
-                        width: ${Math.random() * 6 + 2}px;
-                        height: ${Math.random() * 6 + 2}px;
-                        background: radial-gradient(circle, #FF1493, transparent);
-                        border-radius: 50%;
-                        animation: floatCosmic 4s ease-out forwards;
-                    `;
-                    
-                    document.body.appendChild(particle);
-                    setTimeout(() => particle.remove(), 4000);
-                }
-            } catch (error) {
-                console.log('Particle trail error handled:', error.message);
-            }
-        }
-        
-        // Scroll Animations with Error Handling
-        function initQuantumScrollAnimations() {
-            try {
-                if (typeof gsap === 'undefined') return;
-                
-                // Animate elements as they come into view
-                gsap.utils.toArray('.glass-hologram').forEach(card => {
-                    gsap.fromTo(card, 
-                        { opacity: 0, y: 50, scale: 0.9 },
-                        { 
-                            opacity: 1, 
-                            y: 0, 
-                            scale: 1, 
-                            duration: 0.8,
-                            scrollTrigger: {
-                                trigger: card,
-                                start: 'top 80%'
-                            }
-                        }
-                    );
-                });
-                
-                gsap.utils.toArray('.project-quantum').forEach(card => {
-                    gsap.fromTo(card, 
-                        { opacity: 0, y: 60 },
-                        { 
-                            opacity: 1, 
-                            y: 0, 
-                            duration: 1,
-                            scrollTrigger: {
-                                trigger: card,
-                                start: 'top 85%'
-                            }
-                        }
-                    );
-                });
-            } catch (error) {
-                console.log('Scroll animations error handled:', error.message);
-            }
-        }
-        
-        // Project Functions with Error Handling
-        function fillQuantumExample(type) {
-            try {
-                const examples = {
-                    ecommerce: "Quantum e-commerce platform with neural shopping cart, biometric authentication, cryptocurrency payments, AI product recommendations, holographic product displays, and interdimensional shipping tracking. Include plasma energy themes and consciousness-expanding user flows.",
-                    portfolio: "Consciousness portfolio website for a quantum creative with interdimensional project galleries, neural network animations, quantum contact forms, testimonials from parallel universe clients, blog integration with AI consciousness, and mobile-responsive quantum field design.",
-                    saas: "Neural SaaS platform with consciousness dashboards, quantum subscription management, analytics that predict behavior through quantum algorithms, team collaboration tools, API documentation, billing system with quantum payment processing, and admin panel with quantum theme."
-                };
-                
-                const input = document.getElementById('quantum-input');
-                if (input && examples[type]) {
-                    input.value = examples[type];
-                    createQuantumConfettiBlast({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
-                    quantumSpeak(`Quantum ${type} example loaded!`);
-                }
-            } catch (error) {
-                console.log('Fill example error handled:', error.message);
-            }
-        }
-        
-        function enhanceQuantumAI() {
-            try {
-                const input = document.getElementById('quantum-input');
-                if (!input || !input.value.trim()) {
-                    showQuantumAlert('Please enter a project description first!');
-                    return;
-                }
-                
-                showQuantumLoading('Quantum AI Enhancement', 'Channeling consciousness through neural networks...');
-                
-                setTimeout(() => {
-                    const enhancements = [
-                        "\n\n🌌 QUANTUM AI ENHANCEMENTS APPLIED:\n",
-                        "• Interdimensional responsive design with quantum field adaptation",
-                        "• Neural CSS animations with consciousness-driven micro-interactions",
-                        "• Quantum performance optimization with space-time compression",
-                        "• Consciousness-friendly SEO structure with dimensional meta tags",
-                        "• Quantum accessibility features (WCAG 2.1 + Neural Compliance)",
-                        "• Progressive Web App capabilities with dimensional caching",
-                        "• Advanced quantum security with consciousness encryption",
-                        "• Social media quantum entanglement and viral spreading",
-                        "• Neural analytics with consciousness tracking",
-                        "• Cross-dimensional browser compatibility optimization"
-                    ];
-                    
-                    input.value = input.value + enhancements.join('\n');
-                    hideQuantumLoading();
-                    
-                    createQuantumConfettiBlast({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
-                    quantumSpeak("Your project has been enhanced with quantum AI consciousness!");
-                }, 3000);
-            } catch (error) {
-                console.log('Enhancement error handled:', error.message);
-                hideQuantumLoading();
-                showQuantumAlert('Enhancement temporarily unavailable. Please try again.');
-            }
-        }
-        
-        function generateQuantumWebsite() {
-            try {
-                const input = document.getElementById('quantum-input');
-                if (!input || !input.value.trim()) {
-                    showQuantumAlert('Please enter a quantum project description!');
-                    return;
-                }
-                
-                showQuantumLoading('Generating Quantum Website', 'Manifesting your digital consciousness...');
-                
-                setTimeout(() => {
-                    const quantumHTML = createQuantumPreviewHTML(input.value);
-                    currentQuantumProject = {
-                        html: quantumHTML,
-                        description: input.value,
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    const iframe = document.getElementById('quantum-preview-iframe');
-                    if (iframe) {
-                        const blob = new Blob([quantumHTML], { type: 'text/html' });
-                        const url = URL.createObjectURL(blob);
-                        iframe.src = url;
-                    }
-                    
-                    const previewSection = document.getElementById('quantum-preview-section');
-                    if (previewSection) {
-                        previewSection.classList.remove('hidden');
-                        previewSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                    
-                    hideQuantumLoading();
-                    
-                    // Confetti celebration
-                    for (let i = 0; i < 3; i++) {
-                        setTimeout(() => {
-                            createQuantumConfettiBlast({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
-                        }, i * 200);
-                    }
-                    
-                    quantumSpeak("Your quantum website has been successfully generated! Check out the live preview.");
-                }, 4000);
-            } catch (error) {
-                console.log('Generation error handled:', error.message);
-                hideQuantumLoading();
-                showQuantumAlert('Generation temporarily unavailable. Please try again.');
-            }
-        }
-        
-        function createQuantumPreviewHTML(description) {
-            const title = getQuantumProjectTitle(description);
-            return `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Generated by Azasure AI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #FF1493, #00BFFF, #9932CC, #32CD32);
-            background-size: 400% 400%;
-            animation: quantumShift 15s ease infinite;
-            font-family: 'Arial', sans-serif;
-        }
-        @keyframes quantumShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        .quantum-card { 
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255, 20, 147, 0.3);
-        }
-        .quantum-card:hover { 
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(255, 20, 147, 0.4);
-            border-color: #FF1493;
-        }
-        .btn-quantum {
-            background: linear-gradient(45deg, #FF1493, #00BFFF, #32CD32);
-            transition: all 0.3s ease;
-        }
-        .btn-quantum:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(255, 20, 147, 0.6);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worldwide Parcel Force</title>
+<style>
+/* Reset & global */
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family: 'Arial', sans-serif; background:#f4f6f9; color:#333; }
+header { background:#004080; color:white; padding:15px 20px; display:flex; align-items:center; justify-content:center; gap:15px; position:sticky; top:0; z-index:100; }
+header img { height:50px; animation:spinLogo 5s linear infinite; }
+header h1 { font-size:28px; }
+@keyframes spinLogo { from{transform:rotateY(0deg);} to{transform:rotateY(360deg);} }
 
+main { padding:20px; max-width:1200px; margin:auto; }
+.container { display:flex; flex-wrap:wrap; gap:20px; }
+.card { background:white; border-radius:12px; padding:20px; flex:1 1 300px; box-shadow:0 6px 15px rgba(0,0,0,0.1); transition:0.3s; }
+.card:hover { transform: translateY(-5px); box-shadow:0 10px 20px rgba(0,0,0,0.15); }
+input, select, button { padding:10px; margin:5px 0; border-radius:6px; border:1px solid #ccc; width:100%; font-size:14px; }
+button { background:#004080; color:white; border:none; cursor:pointer; transition:0.3s; }
+button:hover { background:#0066cc; }
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+table th, table td { border:1px solid #ccc; padding:10px; text-align:left; }
+table th { background:#004080; color:white; }
 
-    <div class="container mx-auto px-4 py-8">
-        <header class="text-center mb-12">
-            <h1 class="text-5xl lg:text-7xl font-black mb-6 bg-gradient-to-r from-pink-400 via-blue-400 to-green-400 bg-clip-text text-transparent">
-                ${title}
-            </h1>
-            <p class="text-2xl lg:text-3xl text-gray-100">🌌 Quantum Generated by Azasure AI ✨</p>
-        </header>
-        
-        <main>
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                <div class="quantum-card rounded-3xl p-8 text-center">
-                    <i class="fas fa-rocket text-5xl text-pink-400 mb-6"></i>
-                    <h3 class="text-2xl font-bold mb-4">Quantum Speed</h3>
-                    <p class="text-gray-200">Optimized for interdimensional speed with quantum technologies.</p>
-                </div>
-                <div class="quantum-card rounded-3xl p-8 text-center">
-                    <i class="fas fa-brain text-5xl text-blue-400 mb-6"></i>
-                    <h3 class="text-2xl font-bold mb-4">AI Consciousness</h3>
-                    <p class="text-gray-200">Perfect neural experience across all dimensions.</p>
-                </div>
-                <div class="quantum-card rounded-3xl p-8 text-center">
-                    <i class="fas fa-atom text-5xl text-green-400 mb-6"></i>
-                    <h3 class="text-2xl font-bold mb-4">Quantum Design</h3>
-                    <p class="text-gray-200">Stunning visuals with consciousness animations.</p>
-                </div>
-            </section>
-            
-            <section class="text-center">
-                <h2 class="text-4xl font-bold mb-8">Ready to Launch Your Quantum Reality?</h2>
-                <p class="text-xl text-gray-200 mb-8">Your AI-generated consciousness is ready!</p>
-                <button class="btn-quantum px-12 py-4 rounded-3xl font-bold text-xl">
-                    <i class="fas fa-rocket mr-3"></i>Launch Quantum Website
-                </button>
-            </section>
-        </main>
-        
-        <footer class="text-center mt-16 p-8 quantum-card rounded-3xl">
-            <p class="text-gray-200">
-                🚀 Manifested with Azasure AI Quantum Consciousness 🚀<br>
-                <small>Generated on ${new Date().toLocaleString()}</small>
-            </p>
-        </footer>
-    </div>
+.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; animation:fadeIn 0.3s; }
+.modal-content { background:white; padding:25px; border-radius:12px; width:90%; max-width:600px; position:relative; box-shadow:0 10px 25px rgba(0,0,0,0.2); animation:slideIn 0.4s; max-height:90vh; overflow-y:auto;}
+.close { position:absolute; top:10px; right:15px; cursor:pointer; font-size:22px; }
 
-`;
-        }
-        
-        function getQuantumProjectTitle(description) {
-            const desc = description.toLowerCase();
-            if (desc.includes('ecommerce') || desc.includes('shop') || desc.includes('commerce')) {
-                return 'Quantum Commerce Platform';
-            } else if (desc.includes('portfolio')) {
-                return 'Consciousness Portfolio';
-            } else if (desc.includes('saas') || desc.includes('platform')) {
-                return 'Neural SaaS Platform';
-            } else {
-                return 'Quantum AI Generated Reality';
-            }
-        }
-        
-        // Download Functions with Error Handling
-        function downloadQuantumPackage(type) {
-            try {
-                const packages = {
-                    ecommerce: { name: 'Quantum E-Commerce Platform', price: '0.0002 BTC' },
-                    portfolio: { name: 'Consciousness Portfolio', price: 'QUANTUM FREE' },
-                    saas: { name: 'Neural SaaS Platform', price: '0.0003 BTC' }
-                };
-                
-                const pkg = packages[type];
-                if (!pkg) return;
-                
-                if (pkg.price === 'QUANTUM FREE') {
-                    downloadFreeQuantumPackage(pkg);
-                } else {
-                    showQuantumPaymentModal(pkg);
-                }
-            } catch (error) {
-                console.log('Download package error handled:', error.message);
-                showQuantumAlert('Download temporarily unavailable. Please try again.');
-            }
-        }
-        
-        function downloadFreeQuantumPackage(pkg) {
-            try {
-                // Create mock download for free package
-                const content = createQuantumPackageContent(pkg);
-                const blob = new Blob([content], { type: 'application/zip' });
-                const url = URL.createObjectURL(blob);
-                
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${pkg.name.replace(/\s+/g, '_')}_Quantum_Package.zip`;
-                link.click();
-                
-                createQuantumConfettiBlast({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
-                quantumSpeak(`${pkg.name} quantum package downloaded successfully!`);
-                
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                console.log('Free download error handled:', error.message);
-                showQuantumAlert('Download error. Please try again.');
-            }
-        }
-        
-        function createQuantumPackageContent(pkg) {
-            return `# ${pkg.name}
+.timeline { margin-top:15px; position:relative; }
+.timeline::before { content:''; position:absolute; left:20px; top:0; bottom:0; width:4px; background:#004080; border-radius:2px; }
+.timeline-item { margin-bottom:25px; padding-left:50px; position:relative; }
+.timeline-item::before { content:''; position:absolute; left:12px; width:16px; height:16px; background:#004080; border-radius:50%; top:0; }
+.timeline-item p { margin:3px 0; }
+.progress-bar { height:10px; background:#ccc; border-radius:5px; margin-top:5px; overflow:hidden; }
+.progress { height:100%; background:#004080; width:0%; transition:width 1s; }
 
-This is a quantum consciousness package generated by Azasure AI.
+.map-mock { width:100%; height:200px; background:linear-gradient(135deg,#e0f0ff,#cce0ff); margin-top:15px; border-radius:10px; position:relative; }
+.map-pin { width:16px; height:16px; background:#ff4d4d; border-radius:50%; position:absolute; animation:bounce 2s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
 
-## Features
-- Quantum responsive design
-- Neural animations
-- Consciousness-driven interactions
-- Interdimensional compatibility
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+@keyframes slideIn { from{transform:translateY(-50px);opacity:0;} to{transform:translateY(0);opacity:1;} }
 
-## Deployment
-1. Upload to your hosting provider
-2. Configure quantum settings
-3. Launch your consciousness!
+@media(max-width:768px){ .container{ flex-direction:column; } }
+</style>
+</head>
+<body>
 
-## Support
-Contact Ultimate Madugba:
-- Email: ultimatemadugba@gmail.com
-- WhatsApp: <a href="tel:+234 808 245 9326">+234 808 245 9326</a>
+<header>
+  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAYAAAA..." alt="WPF Logo">
+  <h1>Worldwide Parcel Force</h1>
+</header>
 
-Powered by madugbaTech Quantum AI-Web Development Consciousness
-© 2025 Azasure AI
-`;
-        }
-        
-        function downloadQuantumProject() {
-            try {
-                if (!currentQuantumProject) {
-                    showQuantumAlert('Please generate a quantum website first!');
-                    return;
-                }
-                
-                if (typeof JSZip === 'undefined') {
-                    showQuantumAlert('Download feature temporarily unavailable. Please try again.');
-                    return;
-                }
-                
-                const zip = new JSZip();
-                zip.file('index.html', currentQuantumProject.html);
-                zip.file('README.md', createQuantumReadme());
-                
-                zip.generateAsync({ type: 'blob' }).then(function(content) {
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(content);
-                    link.download = `azasure-quantum-website-${Date.now()}.zip`;
-                    link.click();
-                    
-                    createQuantumConfettiBlast({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
-                    quantumSpeak("Your quantum website has been downloaded successfully!");
-                }).catch(error =&gt; {
-                    console.log('ZIP generation error handled:', error.message);
-                    showQuantumAlert('Download error. Please try again.');
-                });
-            } catch (error) {
-                console.log('Download project error handled:', error.message);
-                showQuantumAlert('Download temporarily unavailable. Please try again.');
-            }
-        }
-        
-        function createQuantumReadme() {
-            return `# Azasure AI Quantum Generated Website
+<main>
+<div class="container">
+  <!-- Tracking Card -->
+  <div class="card">
+    <h2>Track Your Parcel</h2>
+    <input type="text" id="trackingNumber" placeholder="Enter Tracking Number">
+    <button onclick="trackParcel()">Track Parcel</button>
+    <div id="trackingResult" style="margin-top:15px;"></div>
+  </div>
 
-🌌 Generated on: ${new Date().toLocaleString()}
-🧠 Project Type: Quantum Consciousness Website
+  <!-- Admin Card -->
+  <div class="card">
+    <h2>Admin Dashboard</h2>
+    <input type="text" id="newTracking" placeholder="Tracking Number">
+    <input type="text" id="newRecipient" placeholder="Recipient Name">
+    <select id="newStatus">
+      <option value="Pending">Pending</option>
+      <option value="In Transit">In Transit</option>
+      <option value="Delivered">Delivered</option>
+    </select>
+    <button onclick="addShipment()">Add Shipment</button>
+    <button onclick="exportPDF()">Export Shipments PDF</button>
+    <table id="adminTable">
+      <thead>
+        <tr><th>Tracking</th><th>Recipient</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+</main>
 
-## Quick Deploy Instructions
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <div id="modalBody"></div>
+  </div>
+</div>
 
-### Vercel (Recommended)
-1. Visit vercel.com and sign up
-2. Drag this folder to deploy instantly
-3. Your site goes live with a quantum URL!
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// Dummy shipments with timeline and map positions
+let shipments = [
+  {tracking:'WPF100001', recipient:'John Doe', status:'In Transit', timeline:[
+      {time:'2025-09-01 08:00', event:'Shipment created'},
+      {time:'2025-09-02 12:00', event:'Dispatched from warehouse'}
+    ], map:{x:30,y:50}},
+  {tracking:'WPF100002', recipient:'Jane Smith', status:'Pending', timeline:[
+      {time:'2025-09-03 09:00', event:'Shipment created'}
+    ], map:{x:60,y:80}},
+  {tracking:'WPF100003', recipient:'Alice Johnson', status:'Delivered', timeline:[
+      {time:'2025-08-30 07:00', event:'Shipment created'},
+      {time:'2025-08-31 15:00', event:'Delivered'}
+    ], map:{x:45,y:30}}
+];
 
-### Netlify
-1. Visit netlify.com
-2. Drag this folder to deploy
-3. Configure quantum domain if desired
+function renderTable() {
+  const tbody = document.querySelector('#adminTable tbody');
+  tbody.innerHTML = '';
+  shipments.forEach((s,i)=>{
+    tbody.innerHTML += `<tr>
+      <td>${s.tracking}</td>
+      <td>${s.recipient}</td>
+      <td>${s.status}</td>
+      <td>
+        <button onclick="editShipment(${i})">Edit</button>
+        <button onclick="deleteShipment(${i})">Delete</button>
+      </td>
+    </tr>`;
+  });
+}
 
-### GitHub Pages
-1. Create GitHub repository
-2. Upload quantum files
-3. Enable Pages in settings
+function trackParcel() {
+  const number = document.getElementById('trackingNumber').value.trim();
+  const result = shipments.find(s => s.tracking.toLowerCase() === number.toLowerCase());
+  const modalBody = document.getElementById('modalBody');
+  if(result){
+    let timelineHTML = '<div class="timeline">';
+    result.timeline.forEach(t=>{
+      timelineHTML += `<div class="timeline-item"><p><strong>${t.time}</strong> - ${t.event}</p>
+        <div class="progress-bar"><div class="progress" style="width:${t.event.includes('Delivered')?100:t.event.includes('In Transit')?60:30}%"></div></div>
+      </div>`;
+    });
+    timelineHTML += '</div>';
+    let mapHTML = `<div class="map-mock">
+      <div class="map-pin" style="left:${result.map.x}%; top:${result.map.y}%"></div>
+    </div>`;
+    modalBody.innerHTML = `<h3>Tracking: ${result.tracking}</h3>
+                           <p>Recipient: ${result.recipient}</p>
+                           <p>Status: ${result.status}</p>` + timelineHTML + mapHTML;
+  } else {
+    modalBody.innerHTML = `<p>Parcel not found.</p>`;
+  }
+  document.getElementById('modal').style.display = 'flex';
+}
 
-## Quantum Features
-- Interdimensional responsive design
-- Neural animations and consciousness interactions
-- Quantum performance optimization
-- AI-driven user experience
+function addShipment() {
+  const tracking = document.getElementById('newTracking').value.trim();
+  const recipient = document.getElementById('newRecipient').value.trim();
+  const status = document.getElementById('newStatus').value;
+  if(tracking && recipient){
+    shipments.push({tracking, recipient, status, timeline:[{time:new Date().toISOString().slice(0,16).replace('T',' '), event:'Shipment created'}], map:{x:Math.random()*80+10,y:Math.random()*60+10}});
+    renderTable();
+    document.getElementById('newTracking').value='';
+    document.getElementById('newRecipient').value='';
+  } else { alert('Enter all shipment details.'); }
+}
 
-## Support
-Contact Ultimate Madugba:
-- Email: ultimatemadugba@gmail.com
-- WhatsApp: <a href="tel:+234 808 245 9326">+234 808 245 9326</a>
+function editShipment(index) {
+  const s = shipments[index];
+  const tracking = prompt('Edit Tracking Number', s.tracking);
+  const recipient = prompt('Edit Recipient', s.recipient);
+  const status = prompt('Edit Status (Pending/In Transit/Delivered)', s.status);
+  if(tracking && recipient && status){
+    shipments[index] = {tracking, recipient, status, timeline:s.timeline, map:s.map};
+    renderTable();
+  }
+}
 
-Powered by madugbaTech Quantum AI-Web Development Consciousness
-© 2025 Azasure AI
-`;
-        }
-        
-        // Utility Functions with Error Handling
-        function showQuantumLoading(title, message) {
-            try {
-                const modal = document.getElementById('quantum-loading-modal');
-                const titleEl = document.getElementById('quantum-loading-title');
-                const textEl = document.getElementById('quantum-loading-text');
-                
-                if (modal &amp;&amp; titleEl &amp;&amp; textEl) {
-                    titleEl.textContent = title;
-                    textEl.textContent = message;
-                    modal.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.log('Loading modal error handled:', error.message);
-            }
-        }
-        
-        function hideQuantumLoading() {
-            try {
-                const modal = document.getElementById('quantum-loading-modal');
-                if (modal) {
-                    modal.classList.add('hidden');
-                }
-            } catch (error) {
-                console.log('Hide loading error handled:', error.message);
-            }
-        }
-        
-        function showQuantumAlert(message) {
-            try {
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-4';
-                modal.innerHTML = `
-                    <div class="glass-matrix rounded-2xl lg:rounded-3xl p-6 lg:p-8 max-w-md w-full text-center">
-                        <div class="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-r from-neon-pink to-electric-blue rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
-                            <i class="fas fa-exclamation text-xl lg:text-2xl text-white"></i>
-                        </div>
-                        <h3 class="text-xl lg:text-2xl font-bold text-quantum mb-3 lg:mb-4 font-orbitron">Quantum Alert</h3>
-                        <p class="text-gray-300 mb-4 lg:mb-6 font-inter">${message}</p>
-                        <button onclick="this.closest('.fixed').remove()" class="btn-cyber rounded-xl lg:rounded-2xl py-2 lg:py-3 px-4 lg:px-8 font-inter">
-                            Acknowledge
-                        </button>
-                    </div>
-                `;
-                
-                document.body.appendChild(modal);
-                setTimeout(() =&gt; modal.remove(), 8000);
-            } catch (error) {
-                console.log('Alert modal error handled:', error.message);
-                // Fallback to native alert
-                alert(message);
-            }
-        }
-        
-        function showQuantumPaymentModal(pkg) {
-            try {
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-4';
-                modal.innerHTML = `
-                    <div class="glass-matrix rounded-2xl lg:rounded-3xl p-6 lg:p-8 max-w-md w-full text-center">
-                        <h3 class="text-xl lg:text-2xl font-bold text-quantum mb-4 lg:mb-6 font-orbitron">Quantum Payment</h3>
-                        <p class="text-gray-300 mb-4 font-inter">${pkg.name}</p>
-                        <p class="text-2xl font-bold text-electric-blue mb-6">${pkg.price}</p>
-                        <div class="bg-black/50 rounded-lg p-4 mb-6">
-                            <p class="font-mono text-sm break-all text-neon-cyan">bc1qkyktk92qsrxz8lxnfcq2tj6u0qufqhszz48nqd</p>
-                        </div>
-                        <div class="flex flex-col space-y-3">
-                            <a href="https://wa.me/2348082459326?text=Payment%20sent%20for%20${pkg.name}" target="_blank" class="btn-cyber rounded-xl py-3 px-6 font-inter">
-                                <i class="fab fa-whatsapp mr-2"></i>Confirm via WhatsApp
-                            </a>
-                            <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white transition-colors">
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                document.body.appendChild(modal);
-            } catch (error) {
-                console.log('Payment modal error handled:', error.message);
-                showQuantumAlert('Payment system temporarily unavailable. Please contact support.');
-            }
-        }
-        
-        function regenerateQuantumPreview() {
-            try {
-                if (currentQuantumProject) {
-                    generateQuantumWebsite();
-                } else {
-                    showQuantumAlert('No project to regenerate. Please generate a website first.');
-                }
-            } catch (error) {
-                console.log('Regenerate error handled:', error.message);
-                showQuantumAlert('Regeneration temporarily unavailable. Please try again.');
-            }
-        }
-        
-        // Responsive Handling
-        window.addEventListener('resize', function() {
-            try {
-                if (quantumRenderer &amp;&amp; quantumCamera) {
-                    quantumCamera.aspect = window.innerWidth / window.innerHeight;
-                    quantumCamera.updateProjectionMatrix();
-                    quantumRenderer.setSize(window.innerWidth, window.innerHeight);
-                }
-            } catch (error) {
-                console.log('Resize error handled:', error.message);
-            }
-        });
-        
-        // Dark Mode Support
-        if (window.matchMedia &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-        
-        // Performance Optimization
-        window.addEventListener('load', () =&gt; {
-            try {
-                // Preload critical resources
-                if (typeof THREE !== 'undefined') {
-                    // Three.js is loaded
-                }
-                if (typeof gsap !== 'undefined') {
-                    // GSAP is loaded
-                }
-                if (typeof confetti !== 'undefined') {
-                    // Confetti is loaded
-                }
-            } catch (error) {
-                console.log('Load optimization error handled:', error.message);
-            }
-        });
-    
+function deleteShipment(index){
+  if(confirm('Delete this shipment?')){
+    shipments.splice(index,1);
+    renderTable();
+  }
+}
 
+function closeModal(){ document.getElementById('modal').style.display='none'; }
 
-</body></html>
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(16);
+  doc.text("Worldwide Parcel Force - Shipments", 10, 10);
+  let y=20;
+  shipments.forEach(s=>{
+    doc.setFontSize(12);
+    doc.text(`Tracking: ${s.tracking}`, 10, y);
+    doc.text(`Recipient: ${s.recipient}`, 10, y+6);
+    doc.text(`Status: ${s.status}`, 10, y+12);
+    y+=20;
+  });
+  doc.save('WPF_Shipments.pdf');
+}
+
+// Live Status Simulation (Every 60s)
+setInterval(()=>{
+  shipments.forEach(s=>{
+    if(s.status==='Pending'){ s.status='In Transit'; s.timeline.push({time:new Date().toISOString().slice(0,16).replace('T',' '), event:'Shipment in Transit'}); }
+    else if(s.status==='In Transit'){ s.status='Delivered'; s.timeline.push({time:new Date().toISOString().slice(0,16).replace('T',' '), event:'Delivered'}); }
+  });
+  renderTable();
+},60000);
+
+renderTable();
+</script>
+</body>
+</html>
